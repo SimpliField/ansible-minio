@@ -14,9 +14,15 @@ Group={{ minio_group }}
 PermissionsStartOnly=true
 
 EnvironmentFile=-/etc/default/minio
+{% if minio_gcs_gateway != true %}
 ExecStartPre=/bin/bash -c "[ -n \"${MINIO_VOLUMES}\" ] || echo \"Variable MINIO_VOLUMES not set in /etc/default/minio\""
+{% endif %}
 
+{% if minio_gcs_gateway == true %}
+ExecStart={{ minio_bin }} gateway $MINIO_OPTS $MINIO_VOLUMES
+{% else %}
 ExecStart={{ minio_bin }} server $MINIO_OPTS $MINIO_VOLUMES
+{% endif %}
 
 StandardOutput=journal
 StandardError=inherit
